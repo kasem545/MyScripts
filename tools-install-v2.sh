@@ -199,6 +199,7 @@ install_go_tools() {
     "github.com/projectdiscovery/pdtm/cmd/pdtm@latest"
     "github.com/glitchedgitz/cook/v2/cmd/cook@latest"
     "github.com/GoToolSharing/htb-cli@latest"
+    "github.com/ropnop/kerbrute@latest"
   )
 
   for tool in "${go_tools[@]}"; do
