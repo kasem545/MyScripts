@@ -1,36 +1,45 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <ip> <domain> <platform>"
+if [ "$#" -lt 3 ]; then
+    echo "Usage: $0 <ip> <domain1> [domain2 ... domainN] <platform>"
+    echo "Example: sudo $0 10.10.x.x example.htb dc01.example.htb ftp.example.htb htb"
     exit 1
 fi
 
 ip="$1"
-domain="$2"
-platform="$3"
+platform="${!#}"
+num_args=$#
+domains=("${@:2:$((num_args-2))}")
 hosts_file="/etc/hosts"
-zshrc_file="$HOME/.zshrc"
 
-if grep -q "$domain" "$hosts_file"; then
-    sudo sed -i "/$domain/d" "$hosts_file"
-fi
+# Remove any existing lines containing any of the domains
+tmpfile=$(mktemp)
+grepargs=()
+for d in "${domains[@]}"; do
+    grepargs+=(-e "$d")
+done
+sudo grep -vF "${grepargs[@]}" "$hosts_file" > "$tmpfile" || true
 
-platform_section=$(grep -nE "# ====== $platform ======" "$hosts_file" | cut -d':' -f1)
-if [ -n "$platform_section" ]; then
-    sudo sed -i "${platform_section}a $ip $domain" "$hosts_file"
+# Create one single line with all domains for this IP
+entry="$ip"
+for d in "${domains[@]}"; do
+    entry+=" $d"
+done
+
+header="# ====== $platform ======"
+
+if grep -Fxq "$header" "$tmpfile"; then
+    awk -v hdr="$header" -v ent="$entry" '{
+        print $0
+        if ($0==hdr) print ent
+    }' "$tmpfile" | sudo tee "$hosts_file" > /dev/null
 else
-    echo -e "\n# ====== $platform ======" | sudo tee -a "$hosts_file" > /dev/null
-    echo "$ip $domain" | sudo tee -a "$hosts_file" > /dev/null
+    sudo bash -c "cat >> '$hosts_file' <<-EOF
+
+$header
+$entry
+EOF"
 fi
 
-if grep -q "export IP=" "$zshrc_file"; then
-    sed -i "/export IP=/d" "$zshrc_file"
-fi
-echo "export IP=\"$ip\"" >> "$zshrc_file"
-
-echo "Entry added/updated in /etc/hosts under platform '$platform':"
-grep "$domain" "$hosts_file"
-echo "IP variable updated in $zshrc_file:"
-grep "export IP=" "$zshrc_file"
-echo "Run 'source $zshrc_file' to apply changes."
-
+rm -f "$tmpfile"

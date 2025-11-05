@@ -64,6 +64,7 @@ REPOS=(
   "https://github.com/danielmiessler/SecLists.git"
   "https://github.com/HavocFramework/Havoc.git"
   "https://github.com/Greenwolf/ntlm_theft.git"
+  "https://github.com/Adaptix-Framework/AdaptixC2.git"
 )
 
 APT_PACKAGES=(curl wget gcc make build-essential golang-go python3 python3-pip python3-venv pipx parallel jq unzip git docker.io docker-compose cargo ligolo-mp )
