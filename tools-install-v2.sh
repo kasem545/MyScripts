@@ -226,6 +226,7 @@ install_python_tools() {
     "git+https://github.com/s0md3v/uro.git"
     "git+https://github.com/sherlock-project/sherlock.git"
     "git+https://github.com/brightio/penelope.git"
+    "git+https://github.com/freelabz/secator.git"
   )
 
   for pkg in "${py_tools[@]}"; do
