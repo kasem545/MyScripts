@@ -38,6 +38,7 @@ typedef struct {
     int current_section;
     Focus focus;
     char filename[256];
+    time_t created_time;
 } HackPad;
 
 /* ---------------- UI ---------------- */
@@ -84,7 +85,8 @@ void save_HackPad(HackPad *nb, const char *file) {
 
     time_t now = time(NULL);
     fprintf(f, "# HackPad\n");
-    fprintf(f, "Generated: %s\n", ctime(&now));
+    fprintf(f, "Created: %s", ctime(&nb->created_time));
+    fprintf(f, "Edited: %s\n", ctime(&now));
 
     for (int i = 0; i < nb->section_count; i++) {
         fprintf(f, "\n## %s\n\n", nb->sections[i].name);
@@ -106,7 +108,27 @@ void load_HackPad(HackPad *nb, const char *file) {
     while (fgets(line, sizeof(line), f)) {
         line[strcspn(line, "\n")] = 0;
 
-        if (strncmp(line, "## ", 3) == 0 && nb->section_count < MAX_SECTIONS) {
+        if (strncmp(line, "Created: ", 9) == 0) {
+            struct tm tm = {0};
+            char *timestr = line + 9;
+            sscanf(timestr, "%*s %*s %d %d:%d:%d %d",
+                   &tm.tm_mday, &tm.tm_hour, &tm.tm_min, &tm.tm_sec, &tm.tm_year);
+            tm.tm_year -= 1900;
+            
+            char month[4];
+            sscanf(timestr, "%*s %3s", month);
+            const char *months[] = {"Jan","Feb","Mar","Apr","May","Jun",
+                                   "Jul","Aug","Sep","Oct","Nov","Dec"};
+            for (int i = 0; i < 12; i++) {
+                if (strcmp(month, months[i]) == 0) {
+                    tm.tm_mon = i;
+                    break;
+                }
+            }
+            
+            nb->created_time = mktime(&tm);
+        }
+        else if (strncmp(line, "## ", 3) == 0 && nb->section_count < MAX_SECTIONS) {
             cur_sec = nb->section_count++;
             strncpy(nb->sections[cur_sec].name, line + 3, MAX_NAME - 1);
             nb->sections[cur_sec].entry_count = 0;
@@ -435,11 +457,16 @@ void save_as(HackPad *nb) {
 int main(int argc, char *argv[]) {
     HackPad nb = {0};
     nb.focus = FOCUS_SECTIONS;
+    nb.created_time = time(NULL);
     
     const char *file = (argc > 1) ? argv[1] : "HackPad.md";
 
     load_HackPad(&nb, file);
     strncpy(nb.filename, file, 255);
+
+    if (nb.created_time == 0) {
+        nb.created_time = time(NULL);
+    }
 
     if (nb.section_count == 0) {
         nb.section_count = 4;
