@@ -17,7 +17,6 @@
 
 typedef struct {
     char text[MAX_TEXT];
-    time_t timestamp;
 } Entry;
 
 typedef struct {
@@ -90,10 +89,7 @@ void save_HackPad(HackPad *nb, const char *file) {
     for (int i = 0; i < nb->section_count; i++) {
         fprintf(f, "\n## %s\n\n", nb->sections[i].name);
         for (int j = 0; j < nb->sections[i].entry_count; j++) {
-            char ts[64];
-            strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S",
-                    localtime(&nb->sections[i].entries[j].timestamp));
-            fprintf(f, "- [%s] %s\n", ts, nb->sections[i].entries[j].text);
+            fprintf(f, "- %s\n", nb->sections[i].entries[j].text);
         }
     }
     fclose(f);
@@ -128,7 +124,6 @@ void load_HackPad(HackPad *nb, const char *file) {
             }
 
             strncpy(s->entries[s->entry_count].text, txt, MAX_TEXT - 1);
-            s->entries[s->entry_count].timestamp = time(NULL);
             s->entry_count++;
         }
     }
@@ -318,7 +313,6 @@ void add_entry(HackPad *nb) {
     char buf[MAX_TEXT] = {0};
     if (line_editor("New Entry", buf, MAX_TEXT)) {
         strncpy(s->entries[s->entry_count].text, buf, MAX_TEXT - 1);
-        s->entries[s->entry_count].timestamp = time(NULL);
         s->selected_entry = s->entry_count;
         s->entry_count++;
         nb->focus = FOCUS_ENTRIES;
@@ -338,7 +332,6 @@ void edit_entry(HackPad *nb) {
 
     if (line_editor("Edit Entry", buf, MAX_TEXT)) {
         strncpy(s->entries[s->selected_entry].text, buf, MAX_TEXT - 1);
-        s->entries[s->selected_entry].timestamp = time(NULL);
         status_msg("Entry updated!");
     }
 }
@@ -418,7 +411,6 @@ void copy_to_clipboard(HackPad *nb) {
     }
     
     s->entries[s->entry_count] = s->entries[s->selected_entry];
-    s->entries[s->entry_count].timestamp = time(NULL);
     s->selected_entry = s->entry_count;
     s->entry_count++;
     status_msg("Clipboard unavailable - entry duplicated instead");
