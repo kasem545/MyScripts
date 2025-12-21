@@ -83,7 +83,7 @@ void save_HackPad(HackPad *nb, const char *file) {
     }
 
     time_t now = time(NULL);
-    fprintf(f, "# Pentesting HackPad\n");
+    fprintf(f, "# HackPad\n");
     fprintf(f, "Generated: %s\n", ctime(&now));
 
     for (int i = 0; i < nb->section_count; i++) {
