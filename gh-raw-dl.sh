@@ -213,7 +213,7 @@ main() {
         log "Downloading folder (ref: $ref)"
         mkdir -p "$out"
         download_folder "$user" "$repo" "$ref" "$path" "$out"
-        success "Folder saved to: ./$out"
+        success "Folder saved to: $(pwd)/$out"
 
     else
         error "Unknown type: $type"
