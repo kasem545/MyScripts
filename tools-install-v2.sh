@@ -64,6 +64,7 @@ REPOS=(
   "https://github.com/HavocFramework/Havoc.git"
   "https://github.com/Greenwolf/ntlm_theft.git"
   "https://github.com/Adaptix-Framework/AdaptixC2.git"
+  "https://github.com/itm4n/PrivescCheck.git"
 )
 
 APT_PACKAGES=(curl wget gcc make build-essential fzf golang-go python3 python3-pip python3-venv pipx parallel jq unzip git docker.io docker-compose cargo zsh tmux ligolo-mp)
@@ -235,6 +236,8 @@ install_python_tools() {
     "git+https://github.com/sherlock-project/sherlock.git"
     "git+https://github.com/brightio/penelope.git"
     "git+https://github.com/freelabz/secator.git"
+    "git+https://github.com/CravateRouge/bloodyAD.git"
+    "git+https://github.com/CravateRouge/autobloody.git"
   )
 
   for pkg in "${py_tools[@]}"; do
