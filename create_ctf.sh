@@ -183,9 +183,6 @@ main() {
         fi
     done
     
-    echo ""
-    success "Complete: Created $success_count/$total machine structure(s)"
-    info "Tip: Use '$0 --list' to see all machines"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
