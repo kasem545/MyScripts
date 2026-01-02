@@ -67,6 +67,8 @@ REPOS=(
   "https://github.com/itm4n/PrivescCheck.git"
   "https://github.com/diego-treitos/linux-smart-enumeration.git"
   "https://github.com/ShutdownRepo/targetedKerberoast.git"
+  "https://github.com/Leo4j/Invoke-ADEnum.git"
+  "https://github.com/lefayjey/linWinPwn.git"
 )
 
 APT_PACKAGES=(curl wget gcc make build-essential fzf golang-go python3 python3-pip python3-venv pipx parallel jq unzip git docker.io docker-compose cargo zsh tmux ligolo-mp)
@@ -240,6 +242,7 @@ install_python_tools() {
     "git+https://github.com/freelabz/secator.git"
     "git+https://github.com/CravateRouge/bloodyAD.git"
     "git+https://github.com/CravateRouge/autobloody.git"
+    "git+https://github.com/Maxteabag/sqlit.git"
   )
 
   for pkg in "${py_tools[@]}"; do
@@ -315,6 +318,20 @@ install_ronin() {
     fi
   else
     warn "curl not present; cannot install Ronin automatically."
+  fi
+}
+
+
+install_witr() {
+  info "Attempting Witr install via upstream script"
+  if command -v curl &>/dev/null; then
+    if curl -sSL "https://raw.githubusercontent.com/pranshuparmar/witr/main/install.sh " 2>/dev/null | bash; then
+      success "Witr installed"
+    else
+      warn "Witr install script failed"
+    fi
+  else
+    warn "curl not present; cannot install Witr automatically."
   fi
 }
 
@@ -508,6 +525,8 @@ main() {
   install_bloodhound
   echo ""
   install_ronin
+  echo ""
+  install_witr
   echo ""
   install_oh_my_zsh
   echo ""
