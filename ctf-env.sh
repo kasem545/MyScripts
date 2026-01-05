@@ -533,4 +533,4 @@ compdef _ctf_complete ctf-use ctf-edit ctf-delete
 
 alias ctf='ctf-show'
 
-print "${GREEN}✓${RESET} CTF Environment Manager loaded (type ctf-help)"
+#print "${GREEN}✓${RESET} CTF Environment Manager loaded (type ctf-help)"
